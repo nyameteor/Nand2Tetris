@@ -40,4 +40,43 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+    // C-instruction fields
+    And (a=instruction[15], b=instruction[12], out=a);
+    And (a=instruction[15], b=instruction[11], out=c1);
+    And (a=instruction[15], b=instruction[10], out=c2);
+    And (a=instruction[15], b=instruction[9], out=c3);
+    And (a=instruction[15], b=instruction[8], out=c4);
+    And (a=instruction[15], b=instruction[7], out=c5);
+    And (a=instruction[15], b=instruction[6], out=c6);
+    And (a=instruction[15], b=instruction[5], out=d1);
+    And (a=instruction[15], b=instruction[4], out=d2);
+    And (a=instruction[15], b=instruction[3], out=d3);
+    And (a=instruction[15], b=instruction[2], out=j1);
+    And (a=instruction[15], b=instruction[1], out=j2);
+    And (a=instruction[15], b=instruction[0], out=j3);
+    And (a=d3, b=d3, out=writeM);
+
+    // A Register
+    Mux16 (a=instruction, b=outALU1, sel=d1, out=inA);
+    Not (in=instruction[15], out=loadA1);
+    Or (a=loadA1, b=d1, out=loadA);
+    ARegister (in=inA, load=loadA, out=outA1, out=outA2, out[0..14]=addressM);
+    Mux16 (a=outA1, b=inM, sel=a, out=outAOrM);
+
+    // D Register
+    DRegister (in=outALU2, load=d2, out=outD);
+
+    // ALU
+    ALU (x=outD, y=outAOrM, zx=c1, nx=c2, zy=c3, ny=c4, f=c5, no=c6, out=outALU1, out=outALU2, out=outM, zr=zr, ng=ng);
+
+    // PC
+    Not (in=ng, out=notng);
+    Not (in=zr, out=notzr);
+    And (a=notng, b=notzr, out=ps);
+    And (a=ng, b=j1, out=jump1);
+    And (a=zr, b=j2, out=jump2);
+    And (a=ps, b=j3, out=jump3);
+    Or (a=jump1, b=jump2, out=jump1Or2);
+    Or (a=jump1Or2, b=jump3, out=jump);
+    PC (in=outA2, load=jump, inc=true, reset=reset, out[0..14]=pc);
 }
