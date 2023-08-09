@@ -11,12 +11,17 @@ def main():
     argparser = argparse.ArgumentParser(
         description='The Hack assembler'
     )
-    argparser.add_argument('filename')
+    argparser.add_argument('file', metavar='FILE')
+    argparser.add_argument('-o',  metavar='FILE',
+                           dest='output_file', help='write output to FILE')
     args = argparser.parse_args()
 
     cur_dir = Path(__file__).parent
-    src_file = cur_dir.joinpath(args.filename)
-    dst_file = cur_dir.joinpath(src_file.name.replace('.asm', '.hack'))
+    src_file = cur_dir.joinpath(args.file)
+    if args.output_file:
+        dst_file = cur_dir.joinpath(args.output_file)
+    else:
+        dst_file = cur_dir.joinpath(src_file.name.replace('.asm', '.hack'))
     with open(file=src_file, mode='r', encoding='utf-8') as src, \
             open(file=dst_file, mode='w', encoding='utf-8') as dst:
         assembler = Assembler(src=src)
