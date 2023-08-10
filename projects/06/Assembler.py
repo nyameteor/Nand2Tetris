@@ -16,12 +16,12 @@ def main():
                            dest='output_file', help='write output to FILE')
     args = argparser.parse_args()
 
-    cur_dir = Path(__file__).parent
-    src_file = cur_dir.joinpath(args.file)
+    cwd = Path.cwd()
+    src_file = cwd.joinpath(args.file)
     if args.output_file:
-        dst_file = cur_dir.joinpath(args.output_file)
+        dst_file = cwd.joinpath(args.output_file)
     else:
-        dst_file = cur_dir.joinpath(src_file.name.replace('.asm', '.hack'))
+        dst_file = cwd.joinpath(src_file.name.replace('.asm', '.hack'))
     with open(file=src_file, mode='r', encoding='utf-8') as src, \
             open(file=dst_file, mode='w', encoding='utf-8') as dst:
         assembler = Assembler(src=src)
