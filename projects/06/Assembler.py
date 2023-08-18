@@ -11,19 +11,26 @@ def main():
     argparser = argparse.ArgumentParser(
         description='The Hack assembler'
     )
-    argparser.add_argument('file', metavar='FILE')
-    argparser.add_argument('-o',  metavar='FILE',
-                           dest='output_file', help='write output to FILE')
+    argparser.add_argument(
+        'file',
+        metavar='FILE',
+        help='FILE is a file name of the form Xxx.asm'
+    )
+    argparser.add_argument(
+        '-o', '--output',
+        dest='output_file', metavar='FILE',
+        help='write output to FILE'
+    )
     args = argparser.parse_args()
 
     cwd = Path.cwd()
-    src_file = cwd.joinpath(args.file)
+    src_path = cwd.joinpath(args.file)
     if args.output_file:
-        dst_file = cwd.joinpath(args.output_file)
+        dst_path = cwd.joinpath(args.output_file)
     else:
-        dst_file = cwd.joinpath(src_file.name.replace('.asm', '.hack'))
-    with open(file=src_file, mode='r', encoding='utf-8') as src, \
-            open(file=dst_file, mode='w', encoding='utf-8') as dst:
+        dst_path = cwd.joinpath(src_path.name.replace('.asm', '.hack'))
+    with open(file=src_path, mode='r', encoding='utf-8') as src, \
+            open(file=dst_path, mode='w', encoding='utf-8') as dst:
         assembler = Assembler(src=src)
         assembler.translate(dst=dst)
 
