@@ -1,0 +1,42 @@
+class Main {
+    function void main() {
+        var int grade, sum, count, maxGrade;
+        var String name, targetName;
+        var boolean exit;
+
+        do Output.printString("Enter the students data, ending with 'Q':");
+        do Output.println();
+        do Output.println();
+
+        let sum = 0;
+        let count = 0;
+        let maxGrade = 0;
+        let exit = false;
+
+        while (~exit) {
+            let name = Keyboard.readLine("Name: ");
+            if ((name.charAt(0) = 81) & (name.length() = 1)) {  // 'Q' key
+                let exit = true;
+            }
+            if (~exit) {
+                let grade = Keyboard.readInt("Grade: ");
+                let sum = sum + grade;
+                if (grade > maxGrade) {
+                    let maxGrade = grade;
+                    let targetName = name;
+                }
+                let count = count + 1;
+            }
+            do Output.println();
+        }
+
+        do Output.printString("The grades average is ");
+        do Output.printInt(sum / count);
+        do Output.println();
+        do Output.printString("The student with the highest grade is ");
+        do Output.printString(targetName);
+        do Output.println();
+
+        return;
+    }
+}
