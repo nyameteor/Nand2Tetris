@@ -37,9 +37,8 @@ def main() -> None:
                 try:
                     engine.compile_class()
                 except RuntimeError as e:
-                    print(
-                        f'In {src_path.relative_to(cwd)} ' +
-                        f'(line {engine.tokenizer.line_number()}): {e}')
+                    print(f'In {src_path.relative_to(cwd)} ' +
+                          f'(line {engine.tokenizer.line_number()}): {e}')
 
 
 class CompilationEngine():
@@ -56,8 +55,14 @@ class CompilationEngine():
         self.tokenizer = JackTokenizer(f=src)
         self.vm_writer = VMWriter(f=dst)
         self.symbol_table = SymbolTable()
-        self.class_name = None                  # Current class name
-        self.label_index = 0                    # Current label index
+
+        # Current class name
+        self.class_name = None
+        # Subroutine-level label index for `if` statements
+        self.if_label_index = 0
+        # Subroutine-level label index for `while` statements
+        self.while_label_index = 0
+
         self._advance_token()
 
     def compile_class(self) -> None:
@@ -96,10 +101,14 @@ class CompilationEngine():
         type = self.read(pattern=Pattern.SUBROUTINE_TYPE)
         name = self.read(pattern=Pattern.SUBROUTINE_NAME)
 
+        # Reset subroutine-level symbol table
         if subroutine == Text.CONSTRUCTOR or subroutine == Text.METHOD:
             self.symbol_table.resetSubroutine(enable_fields=True)
         else:
             self.symbol_table.resetSubroutine(enable_fields=False)
+        # Reset subroutine-level label indexes
+        self.if_label_index = 0
+        self.while_label_index = 0
 
         self.read(pattern=Text.LEFT_ROUND_BRACKET)
         if subroutine == Text.METHOD:
@@ -216,24 +225,30 @@ class CompilationEngine():
         """
         self.read(pattern=Text.IF)
 
+        cur_label_index = self.if_label_index
+        self.if_label_index += 1
+
         self.read(pattern=Text.LEFT_ROUND_BRACKET)
         self.compile_expression()
-        self.vm_writer.write_arithmetic(Command.NOT)
-        self.vm_writer.write_if(self._formt_label())
+        self.vm_writer.write_if(f'IF_TRUE{cur_label_index}')
+        self.vm_writer.write_goto(f'IF_FALSE{cur_label_index}')
         self.read(pattern=Text.RIGHT_ROUND_BRACKET)
 
         self.read(pattern=Text.LEFT_CURLY_BRACKET)
+        self.vm_writer.write_label(f'IF_TRUE{cur_label_index}')
         self.compile_statements()
-        self.vm_writer.write_goto(self._formt_label(i=1))
         self.read(pattern=Text.RIGHT_CURLY_BRACKET)
 
-        self.vm_writer.write_label(self._formt_label())
         if self.match(pattern=Text.ELSE):
             self.read(pattern=Text.ELSE)
             self.read(pattern=Text.LEFT_CURLY_BRACKET)
+            self.vm_writer.write_goto(f'IF_END{cur_label_index}')
+            self.vm_writer.write_label(f'IF_FALSE{cur_label_index}')
             self.compile_statements()
+            self.vm_writer.write_label(f'IF_END{cur_label_index}')
             self.read(pattern=Text.RIGHT_CURLY_BRACKET)
-        self.vm_writer.write_label(self._formt_label(i=1))
+        else:
+            self.vm_writer.write_label(f'IF_FALSE{cur_label_index}')
 
     def compile_while(self) -> None:
         """
@@ -241,18 +256,20 @@ class CompilationEngine():
         """
         self.read(pattern=Text.WHILE)
 
+        cur_label_index = self.while_label_index
+        self.while_label_index += 1
+
         self.read(pattern=Text.LEFT_ROUND_BRACKET)
-        self.vm_writer.write_label(self._formt_label())
+        self.vm_writer.write_label(f'WHILE_EXP{cur_label_index}')
         self.compile_expression()
         self.vm_writer.write_arithmetic(Command.NOT)
-        self.vm_writer.write_if(self._formt_label(i=1))
+        self.vm_writer.write_if(f'WHILE_END{cur_label_index}')
         self.read(pattern=Text.RIGHT_ROUND_BRACKET)
 
         self.read(pattern=Text.LEFT_CURLY_BRACKET)
         self.compile_statements()
-        self.vm_writer.write_goto(self._formt_label())
-        self.vm_writer.write_label(self._formt_label(i=1))
-        self.label_index += 2
+        self.vm_writer.write_goto(f'WHILE_EXP{cur_label_index}')
+        self.vm_writer.write_label(f'WHILE_END{cur_label_index}')
         self.read(pattern=Text.RIGHT_CURLY_BRACKET)
 
     def compile_do(self) -> None:
@@ -325,7 +342,8 @@ class CompilationEngine():
             if keyword_const == Text.FALSE or keyword_const == Text.NULL:
                 self.vm_writer.write_push(segment=Segment.CONSTANT, index=0)
             elif keyword_const == Text.TRUE:
-                self.vm_writer.write_push(segment=Segment.CONSTANT, index=-1)
+                self.vm_writer.write_push(segment=Segment.CONSTANT, index=0)
+                self.vm_writer.write_arithmetic(command=Command.NOT)
             elif keyword_const == Text.THIS:
                 self.vm_writer.write_push(segment=Segment.POINTER, index=0)
         elif self.match(pattern=Pattern.IDENTIFIER):
@@ -491,9 +509,6 @@ class CompilationEngine():
     def _advance_token(self) -> None:
         if self.tokenizer.has_more_tokens():
             self.tokenizer.advance()
-
-    def _formt_label(self, i=0) -> str:
-        return f'L{self.label_index + i}'
 
 
 class SyntaxError(RuntimeError):
