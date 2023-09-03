@@ -10,25 +10,80 @@
  */ 
 class Memory {
 
+    static Array ram;
+    static Array heap;
+    static int freeList;
+
     /** Initializes the class. */
     function void init() {
+        let ram = 0;
+        let heap = 2048;        // heapBase
+        let freeList = 2048;    // address of first free segment
+        let heap[0] = -1;       // address of next free segment
+        let heap[1] = 14335;    // size of free segment
+        return;
     }
 
     /** Returns the RAM value at the given address. */
     function int peek(int address) {
+        return ram[address];
     }
 
     /** Sets the RAM value at the given address to the given value. */
     function void poke(int address, int value) {
+        let ram[address] = value;
+        return;
     }
 
     /** Finds an available RAM block of the given size and returns
      *  a reference to its base address. */
     function int alloc(int size) {
+        var int curSegment;
+        var int bestSegment;
+        var int block;              // address for allocated segment
+        var int blockSize;
+
+        let blockSize = size + 2;
+
+        // Find the smallest possible segment in freeList.
+        let curSegment = freeList;
+        let bestSegment = freeList;
+        while (~(curSegment = -1)) {
+            if ((curSegment[1] > blockSize) | (curSegment[1] = blockSize)) {
+                if (bestSegment[1] > curSegment[1]) {
+                    let bestSegment = curSegment;
+                }
+            }
+            let curSegment = curSegment[0];
+        }
+        // Failed to find the free segment.
+        if (bestSegment[1] < blockSize) {
+            return -1;
+        }
+        let block = (bestSegment + bestSegment[1] + 2) - blockSize;
+        let block[0] = -1;
+        let block[1] = size;
+        let bestSegment[1] = bestSegment[1] - blockSize;
+        return block;
     }
 
     /** De-allocates the given object (cast as an array) by making
      *  it available for future allocations. */
     function void deAlloc(Array o) {
+        var int curSegment;
+        var int prevSegment;
+
+        // Find the previous free segment of `o`.
+        let curSegment = freeList;
+        let prevSegment = -1;
+        while ((~(curSegment = -1)) & (curSegment < o)) {
+            let prevSegment = curSegment;
+            let curSegment = curSegment[0];
+        }
+
+        // Append `o` to the freeList.
+        let o[0] = prevSegment[0];
+        let prevSegment[0] = o;
+        return;
     }    
 }
