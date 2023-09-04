@@ -131,4 +131,15 @@ class Math {
             return b;
         }
     }
+
+    /** Returns x after setting i-th bit of x to 1 (b = true) or 0 (b = false).
+     *  This function is NOT a part of the Jack OS API.
+     */
+    function int setBit(int x, int i, boolean b) {
+        if (b) {
+            return x | twoToThe[i];
+        } else {
+            return x & (~twoToThe[i]);
+        }
+    }
 }
