@@ -22,7 +22,7 @@ class Screen {
         let width = 512;
         let height = 256;
         let screenBase = 16384;
-        let screenTop = 24576;      // screenBase + ((width * height) / 16)
+        let screenTop = 24575;      // screenBase + ((width * height) / 16) - 1
         let color = true;
         return;
     }

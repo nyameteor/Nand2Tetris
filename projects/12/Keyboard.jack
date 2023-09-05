@@ -8,8 +8,12 @@
  */
 class Keyboard {
 
+    static int keyboardBase;
+
     /** Initializes the keyboard. */
     function void init() {
+        let keyboardBase = 24576;
+        return;
     } 
 
     /**
@@ -33,6 +37,7 @@ class Keyboard {
      * F1 - F12 = 141 - 152
      */
     function char keyPressed() {
+        return Memory.peek(keyboardBase);
     }
 
     /**								
@@ -41,6 +46,22 @@ class Keyboard {
      * of the pressed key.
      */
     function char readChar() {
+        var char c, result;
+
+        // Waits until a key is pressed.
+        let c = Keyboard.keyPressed();
+        while (c = 0) {
+            let c = Keyboard.keyPressed();
+        }
+        let result = c;
+        // Waits until the key is released
+        while (~(c = 0)) {
+            let c = Keyboard.keyPressed();
+        }
+        if ((result > 32) & (result < 127)) {
+            do Output.printChar(result);
+        }
+        return result;
     }
 
     /**								
@@ -49,6 +70,27 @@ class Keyboard {
      * and returns its value. Also handles user backspaces.
      */
     function String readLine(String message) {
+        var String str;
+        var char c;
+
+        do Output.printString(message);
+        let str = String.new(64);
+        while (true) {
+            let c = Keyboard.readChar();
+            if (c = String.newLine()) {
+                do Output.println();
+                return str;
+            }
+            if (c = String.backSpace()) {
+                if (str.length() > 0) {
+                    do str.eraseLastChar();
+                    do Output.backSpace();
+                }
+            } else {
+                do str.appendChar(c);
+            }
+        }
+        return str;
     }   
 
     /**								
@@ -58,5 +100,9 @@ class Keyboard {
      * entered text is detected). Also handles user backspaces. 
      */
     function int readInt(String message) {
+        var String str;
+
+        let str = Keyboard.readLine(message);
+        return str.intValue();
     }
 }
