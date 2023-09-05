@@ -139,7 +139,18 @@ class Math {
         if (b) {
             return x | twoToThe[i];
         } else {
-            return x & (~twoToThe[i]);
+            return x & ~twoToThe[i];
+        }
+    }
+
+    /** Returns i-th bit of x, true if bit is 1, else false.
+     *  This function is NOT a part of the Jack OS API.
+     */
+    function boolean getBit(int x, int i) {
+        if (x & twoToThe[i] = 0) {
+            return false;
+        } else {
+            return true;
         }
     }
 }

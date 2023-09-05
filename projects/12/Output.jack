@@ -18,9 +18,23 @@ class Output {
 
     // Character map for displaying characters
     static Array charMaps; 
+    static int screenWidth;
+    static int screenHeight;
+    static int charWidth;
+    static int charHeight;
+    static int x;
+    static int y;
 
     /** Initializes the screen, and locates the cursor at the screen's top-left. */
     function void init() {
+        do Output.initMap();
+        let screenWidth = 512;
+        let screenHeight = 256;
+        let charWidth = 8;
+        let charHeight = 11;
+        let x = 0;
+        let y = 0;
+        return;
     }
 
     // Initializes the character map array
@@ -71,7 +85,7 @@ class Output {
         do Output.create(64,30,51,51,59,59,59,27,3,30,0,0);  // @
         do Output.create(63,30,51,51,24,12,12,0,12,12,0,0);  // ?
 
-        do Output.create(65,0,0,0,0,0,0,0,0,0,0,0);          // A ** TO BE FILLED **
+        do Output.create(65,12,30,51,51,63,51,51,51,51,0,0); // A
         do Output.create(66,31,51,51,51,31,51,51,51,31,0,0); // B
         do Output.create(67,28,54,35,3,3,3,35,54,28,0,0);    // C
         do Output.create(68,15,27,51,51,51,51,51,27,15,0,0); // D
@@ -176,28 +190,102 @@ class Output {
     /** Moves the cursor to the j-th column of the i-th row,
      *  and erases the character displayed there. */
     function void moveCursor(int i, int j) {
+        if (~(j * charWidth < screenWidth)) {
+            return;
+        }
+        if (~(i * charHeight < screenHeight)) {
+            return;
+        }
+        let x = j * charWidth;
+        let y = i * charHeight;
+        return;
     }
 
     /** Displays the given character at the cursor location,
      *  and advances the cursor one column forward. */
     function void printChar(char c) {
+        var Array map;
+        var int i, j, value;
+
+        let map = Output.getMap(c);
+        let i = 0;
+        while (i < charHeight) {
+            let value = map[i];
+            let j = 0;
+            while (j < charWidth) {
+                if (Math.getBit(value, j)) {
+                    do Screen.drawPixel(x + j, y + i);
+                }
+                let j = j + 1;
+            }
+            let i = i + 1;
+        }
+        do Output.advanceCursor();
+        return;
     }
 
     /** displays the given string starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printString(String s) {
+        var int i, length;
+
+        let i = 0;
+        let length = s.length();
+        while (i < length) {
+            do Output.printChar(s.charAt(i));
+            let i = i + 1;
+        }
+        return;
     }
 
     /** Displays the given integer starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printInt(int i) {
+        var String s;
+
+        let s = String.new(16);
+        do s.setInt(i);
+        do Output.printString(s);
+        do s.dispose();
+        return;
     }
 
     /** Advances the cursor to the beginning of the next line. */
     function void println() {
+        if (y + charHeight + charHeight > screenHeight) {
+            let y = 0;
+        } else {
+            let y = y + charHeight;
+        }
+        let x = 0;
+        return;
     }
 
     /** Moves the cursor one column back. */
     function void backSpace() {
+        if (x - charWidth < 0) {
+            if (y - charHeight > 0) {
+                let y = y - charHeight;
+                let x = (screenWidth / charWidth - 1) * charWidth;
+            }
+        } else {
+            let x = x - charWidth;
+        }
+        return;
+    }
+
+    /** This function is NOT a part of the Jack OS API. */
+    function void advanceCursor() {
+        if (x + charWidth + charWidth > screenWidth) {
+            if (y + charHeight + charHeight > screenHeight) {
+                let y = 0;
+            } else {
+                let y = y + charHeight;
+            }
+            let x = 0;
+        } else {
+            let x = x + charWidth;
+        }
+        return;
     }
 }
