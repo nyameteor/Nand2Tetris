@@ -148,17 +148,69 @@ class Screen {
 
     /** This function is NOT a part of the Jack OS API. */
     function void drawHorizontalLine(int x1, int x2, int y) {
-        var int dx, a;
+        var int minX, maxX;
+        var int i1, j1, i2, j2;
+        var int address, value;
 
-        let dx = x2 - x1;
-        let a = 0;
-        while (~(Math.abs(a) > Math.abs(dx))) {
-            do Screen.drawPixel(x1 + a, y);
-            if (dx > 0) {
-                let a = a + 1;
-            } else {
-                let a = a - 1;
+        if ((y < 0) | (y > height)) {
+            return;
+        }
+        if (x1 < 0) {
+            let x1 = 0;
+        }
+        if (x1 > width) {
+            let x1 = width;
+        }
+        if (x2 < 0) {
+            let x2 = 0;
+        }
+        if (x2 > width) {
+            let x2 = width;
+        }
+
+        if (x1 = x2) {
+            return;
+        }
+        if (x1 < x2) {
+            let minX = x1;
+            let maxX = x2;
+        } else {
+            let minX = x2;
+            let maxX = x1;
+        }
+
+        let i1 = minX / 16;
+        let j1 = minX - (i1 * 16);
+        let i2 = maxX / 16;
+        let j2 = maxX - (i2 * 16);
+        while (~(i1 > i2)) {
+            let address = screenBase + (width / 16 * y) + i1;
+            let value = Memory.peek(address);
+            if (i1 = i2) {
+                while (~(j1 > j2)) {
+                    let value = Math.setBit(value, j1, color);
+                    let j1 = j1 + 1;
+                }
+                do Memory.poke(address, value);
+                let j1 = 0;
             }
+            if (i1 < i2) {
+                if (j1 = 0) {
+                    if (color) {
+                        let value = value | -1;
+                    } else {
+                        let value = value & 0;
+                    }
+                } else {
+                    while (j1 < 16) {
+                        let value = Math.setBit(value, j1, color);
+                        let j1 = j1 + 1;
+                    }
+                }
+                do Memory.poke(address, value);
+                let j1 = 0;
+            }
+            let i1 = i1 + 1;
         }
         return;
     }

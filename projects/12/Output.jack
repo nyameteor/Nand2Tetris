@@ -198,6 +198,10 @@ class Output {
         }
         let x = j * charWidth;
         let y = i * charHeight;
+        // Erases the character.
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x, y, x + charWidth, y + charHeight);
+        do Screen.setColor(true);
         return;
     }
 
