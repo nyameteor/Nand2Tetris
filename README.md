@@ -1,6 +1,7 @@
 # Nand2Tetris
 
 This is my coursework for self-studying Nand2Tetris.
+For an overview of the course, please see the [course website](https://www.nand2tetris.org/).
 
 ## Course Resources
 
@@ -27,5 +28,5 @@ This is my coursework for self-studying Nand2Tetris.
 | Project 8: VM II: Program Control        | Completed |
 | Project 9: High-Level Language           | Completed |
 | Project 10: Compiler I: Syntax Analysis  | Completed |
-| Project 11: Compiler II: Code Generation |           |
-| Project 12: Operating System             |           |
+| Project 11: Compiler II: Code Generation | Completed |
+| Project 12: Operating System             | Completed |
