@@ -10,7 +10,7 @@ from VMWriter import VMWriter, Segment, Command
 
 def main() -> None:
     argparser = argparse.ArgumentParser(
-        description='A syntax analyzer for the Jack language'
+        description='A compiler for the Jack language'
     )
     argparser.add_argument(
         'source',
