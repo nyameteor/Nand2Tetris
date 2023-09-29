@@ -1,6 +1,6 @@
 # Nand2Tetris
 
-This is my coursework for self-studying Nand2Tetris.
+This is my coursework for self-studying Nand2Tetris, written in Python 3.
 For an overview of the course, please see the [course website](https://www.nand2tetris.org/).
 
 ## Course Resources
@@ -41,16 +41,27 @@ If you want to run simulations on the Hack computer, please download the necessa
 
 Source code: [projects/06/Assembler.py](projects/06/Assembler.py)
 
+Go to folder:
+
 ```sh
 cd projects/06
+```
 
-# Translate the examples.
+Translate the examples:
+
+```sh
 make build
+```
 
-# Compare the translated results with the supplied assembler.
+Compare the translated results with the supplied assembler:
+
+```sh
 make compare
+```
 
-# Clean files.
+Clean built files:
+
+```sh
 make clean
 ```
 
@@ -58,16 +69,27 @@ make clean
 
 Source code: [projects/08/VMTranslator.py](projects/08/VMTranslator.py)
 
+Go to folder:
+
 ```sh
 cd projects/08
+```
 
-# Translate the examples.
+Translate the examples:
+
+```sh
 make build
+```
 
-# Run tests on CPU Emulator.
+Run tests in the supplied CPU Emulator:
+
+```sh
 make test
+```
 
-# Clean files.
+Clean built files:
+
+```sh
 make clean
 ```
 
@@ -80,22 +102,34 @@ which means it will generate the same VM code as the supplied compiler for the s
 But now, it only gives the similar error messages during lexical analysis,
 and lacks user-friendly error messages during syntactic analysis.
 
+Go to folder:
+
 ```sh
 cd projects/11
+```
 
-# Compile the examples.
+Compile the examples:
+
+```sh
 make build
+```
 
-# This project has no test scripts, so we need to do manual testing.
-# To test the compiler implementation, we can execute the Pong game in the
-# supplied VM Emulator:
-# 1. Start the VM Emulator:
-sh ../../tools/VMEmulator.sh
-# 2. Load the program "projects/11/Pong".
-# 3. change the "Animate" setting to "No animation".
-# 4. Run the game to see if it works.
+This project has no test scripts, so we need to do manual testing.
+To test the compiler implementation, we can execute the Pong game in the supplied VM Emulator:
 
-# Clean files.
+1. Start the VM Emulator:
+
+   ```sh
+   sh ../../tools/VMEmulator.sh
+   ```
+
+2. Load the program "projects/11/Pong".
+3. Change the "Animate" setting to "No animation".
+4. Run the game to see if it works.
+
+Clean built files:
+
+```sh
 make clean
 ```
 
@@ -103,16 +137,24 @@ make clean
 
 Source code: [projects/12](projects/12)
 
+Go to folder:
+
 ```sh
 cd projects/12
+```
 
-# Build Jack OS and compile the examples.
+Build Jack OS and compile the examples:
+
+```sh
 make build
+```
 
-# This project has no test scripts, so we need to do manual testing.
-# To test the entire OS implementation, we can execute the Pong game in the
-# supplied VM Emulator, just like how we tested the Jack compiler.
+This project has no test scripts, so we need to do manual testing.
+To test the entire OS implementation, we can execute the Pong game in the supplied VM Emulator,
+just like how we tested the Jack compiler.
 
-# Clean files.
+Clean built files:
+
+```sh
 make clean
 ```
